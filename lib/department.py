@@ -15,6 +15,28 @@ class Department:
     def __repr__(self):
         return f"<Department {self.id}: {self.name}, {self.location}>"
 
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        if isinstance(name, str) and len(name):
+            self._name = name
+        else:
+            raise ValueError("Name must be a non-empty string")
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, location):
+        if isinstance(location, str) and len(location):
+            self._location = location
+        else:
+            raise ValueError("Location must be a non-empty string")
+
     @classmethod
     def create_table(cls):
         """ Create a new table to persist the attributes of Department instances """
@@ -77,7 +99,7 @@ class Department:
             WHERE id = ?
         """
 
-        CURSOR.execute(sql, (self.id,))
+        CURSOR.execute(sql, (self.id, ))
         CONN.commit()
 
         # Delete the dictionary entry using id as the key
@@ -124,7 +146,7 @@ class Department:
             WHERE id = ?
         """
 
-        row = CURSOR.execute(sql, (id,)).fetchone()
+        row = CURSOR.execute(sql, (id, )).fetchone()
         return cls.instance_from_db(row) if row else None
 
     @classmethod
@@ -136,7 +158,7 @@ class Department:
             WHERE name is ?
         """
 
-        row = CURSOR.execute(sql, (name,)).fetchone()
+        row = CURSOR.execute(sql, (name, )).fetchone()
         return cls.instance_from_db(row) if row else None
 
     def employees(self):
@@ -146,9 +168,10 @@ class Department:
             SELECT * FROM employees
             WHERE department_id = ?
         """
-        CURSOR.execute(sql, (self.id,),)
+        CURSOR.execute(
+            sql,
+            (self.id, ),
+        )
 
         rows = CURSOR.fetchall()
-        return [
-            Employee.instance_from_db(row) for row in rows
-        ]
+        return [Employee.instance_from_db(row) for row in rows]
